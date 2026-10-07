@@ -1,0 +1,20 @@
+# Copyright (c) 2026 Wissem Chiha
+# Copyright (c) 2009-2017 Dave Gamble and cJSON contributors
+# Licensed under the MIT License
+
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "cjson",
+    srcs = ["cJSON.c"],
+    hdrs = ["cJSON.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "cjson_utils",
+    srcs = ["cJSON_Utils.c"],
+    hdrs = ["cJSON_Utils.h"],
+    deps = [":cjson"],
+    visibility = ["//visibility:public"],
+)

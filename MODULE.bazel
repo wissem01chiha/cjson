@@ -1,0 +1,12 @@
+# Copyright (c) 2026 Wissem Chiha
+# Copyright (c) 2009-2017 Dave Gamble and cJSON contributors
+# Licensed under the MIT License
+
+module(
+    name = "cjson",
+    version = "1.7.19",
+    bazel_compatibility = [">=9.0.1"],
+
+)
+
+bazel_dep(name = "rules_cc", version = "0.2.17")

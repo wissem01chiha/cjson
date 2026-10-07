@@ -18,3 +18,8 @@ libcjson_utils.so.*
 cmake-build-debug
 *.lst
 *.lss
+MODULE.bazel.lock
+bazel-bin
+bazel-out
+bazel-cjson 
+bazel-testlogs 
