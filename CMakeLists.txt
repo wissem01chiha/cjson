@@ -19,7 +19,7 @@ option(ENABLE_CUSTOM_COMPILER_FLAGS "Enables custom compiler flags" ON)
 if (ENABLE_CUSTOM_COMPILER_FLAGS)
     if (("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"))
         list(APPEND custom_compiler_flags
-            -std=c89
+            -std=c99 # upgrade to c99 because unity test used c99 features
             -pedantic
             -Wall
             -Wextra
@@ -72,6 +72,20 @@ if (ENABLE_SANITIZERS)
         -fsanitize=integer
         -fno-sanitize-recover
         )
+endif()
+
+option(ENABLE_COVERAGE "Enables code coverage reporting for non-debug builds" ON)
+if(ENABLE_COVERAGE)
+    if(NOT MSVC)
+        list(APPEND custom_compiler_flags
+            --coverage
+            -fprofile-arcs
+            -ftest-coverage
+        )
+        list(APPEND CMAKE_EXE_LINKER_FLAGS "--coverage")
+    else()
+        message(WARNING "coverage is not supported with msvc compiler")
+    endif()
 endif()
 
 option(ENABLE_SAFE_STACK "Enables the SafeStack instrumentation pass by the Code Pointer Integrity Project" OFF)

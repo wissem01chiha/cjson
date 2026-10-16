@@ -1,0 +1,46 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ master]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake gcc lcov
+
+    - name: Configure CMake with coverage
+      run: |
+        mkdir build
+        cd build
+        cmake -DENABLE_COVERAGE=ON -DENABLE_CJSON_TEST=ON ..
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
+    - name: Generate coverage report
+      run: |
+        cd build
+        lcov --directory . --capture --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info
+        lcov --list coverage.info
+
+    - name: Upload to Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        files: ./build/coverage.info
+        flag-name: ubuntu
+        parallel: false

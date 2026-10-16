@@ -480,7 +480,8 @@ static void cjson_functions_should_not_crash_with_null_pointers(void)
     TEST_ASSERT_NULL(cJSON_SetValuestring(item, NULL));
     cJSON_Minify(NULL);
     /* cJSON_SetNumberHelper should handle NULL gracefully */
-    TEST_ASSERT_TRUE(isnan(cJSON_SetNumberHelper(NULL, 0)));
+    double result = cJSON_SetNumberHelper(NULL, 0);
+    TEST_ASSERT_TRUE((result != result) || (result > DBL_MAX) || (result < -DBL_MAX));
 
     /* restore corrupted item2 to delete it */
     item2->prev = originalPrev;
