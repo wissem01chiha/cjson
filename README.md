@@ -3,6 +3,7 @@
 Ultralightweight JSON parser in ANSI C.
 
 ![GitHub License](https://img.shields.io/github/license/wissem01chiha/cjson)
+[![Coverage Status](https://coveralls.io/repos/github/wissem01chiha/cjson/badge.svg)](https://coveralls.io/github/wissem01chiha/cjson)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/wissem01chiha/cjson/master.svg)](https://results.pre-commit.ci/latest/github/wissem01chiha/cjson/master)
 
 ## Table of contents
