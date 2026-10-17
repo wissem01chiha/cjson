@@ -9,6 +9,8 @@ cmake_policy(SET CMP0054 NEW)  # set CMP0054 policy
 
 include(GNUInstallDirs)
 
+option(ENABLE_CJSON_TEST "Enable building cJSON test" ON)
+
 set(CJSON_VERSION_SO 1)
 set(CJSON_UTILS_VERSION_SO 1)
 
@@ -19,7 +21,6 @@ option(ENABLE_CUSTOM_COMPILER_FLAGS "Enables custom compiler flags" ON)
 if (ENABLE_CUSTOM_COMPILER_FLAGS)
     if (("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"))
         list(APPEND custom_compiler_flags
-            -std=c99 # upgrade to c99 because unity test used c99 features
             -pedantic
             -Wall
             -Wextra
@@ -47,6 +48,11 @@ if (ENABLE_CUSTOM_COMPILER_FLAGS)
             -Wused-but-marked-unused
             -Wswitch-enum
         )
+        if (ENABLE_CJSON_TEST)
+            list(APPEND custom_compiler_flags -std=c99)
+        else()
+            list(APPEND custom_compiler_flags -std=c89)
+        endif()
     elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
         # Disable warning c4001 - nonstandard extension 'single line comment' was used
         # Define _CRT_SECURE_NO_WARNINGS to disable deprecation warnings for "insecure" C library functions
@@ -251,7 +257,6 @@ if(ENABLE_TARGET_EXPORT)
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/cJSON")
 endif()
 
-option(ENABLE_CJSON_TEST "Enable building cJSON test" ON)
 if(ENABLE_CJSON_TEST)
     enable_testing()
 

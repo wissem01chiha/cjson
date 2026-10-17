@@ -20,6 +20,7 @@ Ultralightweight JSON parser in ANSI C.
       - [CMake](#cmake)
       - [Makefile](#makefile)
       - [Meson](#meson)
+      - [Bazel](#bazel)
       - [Vcpkg](#vcpkg)
     - [Including cJSON](#including-cjson)
     - [Data Structure](#data-structure)
@@ -94,7 +95,7 @@ There are several ways to incorporate cJSON into your project.
 
 Because the entire library is only one C file and one header file, you can just copy `cJSON.h` and `cJSON.c` to your projects source and start using it.
 
-cJSON is written in ANSI C (C89) in order to support as many platforms and compilers as possible.
+cJSON itself is written in ANSI C (C89) to support as many platforms and compilers as possible. However, building the tests and fuzzing scripts requires a C99-compliant compiler.
 
 #### CMake
 
@@ -143,13 +144,14 @@ On Windows CMake is usually used to create a Visual Studio solution file by runn
 
 #### Makefile
 
-**NOTE:** This Method is deprecated. Use CMake if at all possible. Makefile support is limited to fixing bugs.
+>[!NOTE]
+> This Method is deprecated. Use CMake if at all possible. Makefile support is limited to fixing bugs.
 
 If you don't have CMake available, but still have GNU make. You can use the makefile to build cJSON:
 
 Run this command in the directory with the source code and it will automatically compile static and shared libraries and a little test program (not the full test suite).
 
-```
+```shell
 make all
 ```
 
@@ -171,6 +173,7 @@ example = executable(
 )
 ```
 
+#### Bazel
 
 #### Vcpkg
 
