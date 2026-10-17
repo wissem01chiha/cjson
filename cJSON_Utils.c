@@ -643,6 +643,16 @@ sort_list (cJSON *list, const cJSON_bool case_sensitive)
       second->prev = result_tail;
     }
 
+  /* Restore the list invariant: the head's prev points to the tail
+   * (add_item_to_array() relies on it for O(1) appends). The merge above
+   * only maintains prev of appended elements, so result->prev is stale. */
+  current_item = result;
+  while (current_item->next != NULL)
+    {
+      current_item = current_item->next;
+    }
+  result->prev = current_item;
+
   return result;
 }
 

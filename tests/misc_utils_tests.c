@@ -70,12 +70,50 @@ cjson_utils_functions_shouldnt_crash_with_null_pointers (void)
   cJSON_Delete (item);
 }
 
+static void
+sort_object_should_restore_prev_tail_invariant (void)
+{
+  /* cJSON relies on child->prev pointing to the list tail (used by
+   * add_item_to_array() for O(1) appends). The mergesort in sort_list()
+   * must restore that invariant, otherwise a later delete+add performs a
+   * use-after-free write into the stale prev node (issue #1090). */
+  cJSON *object = cJSON_Parse ("{\"a\":1,\"b\":1,\"c\":1,\"e\":1,\"d\":1}");
+  cJSON *tail = NULL;
+  TEST_ASSERT_NOT_NULL (object);
+
+  cJSONUtils_SortObject (object);
+
+  tail = object->child;
+  while ((tail != NULL) && (tail->next != NULL))
+    {
+      tail = tail->next;
+    }
+  TEST_ASSERT_NOT_NULL (tail);
+  TEST_ASSERT_EQUAL_PTR (tail, object->child->prev);
+
+  /* delete the interior node head->prev used to point at, then append */
+  cJSON_DeleteItemFromObject (object, "d");
+  cJSON_AddItemToObject (object, "z", cJSON_CreateNumber (1));
+
+  tail = object->child;
+  while ((tail != NULL) && (tail->next != NULL))
+    {
+      tail = tail->next;
+    }
+  TEST_ASSERT_NOT_NULL (tail);
+  TEST_ASSERT_EQUAL_STRING ("z", tail->string);
+  TEST_ASSERT_EQUAL_PTR (tail, object->child->prev);
+
+  cJSON_Delete (object);
+}
+
 int
 main (void)
 {
   UNITY_BEGIN ();
 
   RUN_TEST (cjson_utils_functions_shouldnt_crash_with_null_pointers);
+  RUN_TEST (sort_object_should_restore_prev_tail_invariant);
 
   return UNITY_END ();
 }
