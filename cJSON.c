@@ -601,11 +601,11 @@ ensure (printbuffer *const p, size_t needed)
           return NULL;
         }
 
-        /* a zero length buffer (like the one from a zero prebuffer) owns no bytes,
-         * so there is nothing valid that could be copied out of it */
-        if (p->length > 0)
+      /* a zero length buffer (like the one from a zero prebuffer) owns no
+       * bytes, so there is nothing valid that could be copied out of it */
+      if (p->length > 0)
         {
-          memcpy(newbuffer, p->buffer, p->offset + 1);
+          memcpy (newbuffer, p->buffer, p->offset + 1);
         }
       p->hooks.deallocate (p->buffer);
     }
