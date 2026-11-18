@@ -1,23 +1,37 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 project(cJSON
     VERSION 1.7.19
     LANGUAGES C)
 
-cmake_policy(SET CMP0054 NEW)  # set CMP0054 policy
-
-include(GNUInstallDirs)
+# set CMP0054 policy
+cmake_policy(SET CMP0054 NEW)  
 
 option(ENABLE_CJSON_TEST "Enable building cJSON test" ON)
+option(ENABLE_CUSTOM_COMPILER_FLAGS "Enables custom compiler flags" ON)
+option(ENABLE_SANITIZERS "Enables AddressSanitizer and UndefinedBehaviorSanitizer." OFF)
+option(ENABLE_COVERAGE "Enables code coverage reporting for non-debug builds" ON)
+option(ENABLE_SAFE_STACK "Enables the SafeStack instrumentation pass by the Code Pointer Integrity Project" OFF)
+option(ENABLE_PUBLIC_SYMBOLS "Export library symbols." ON)
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(ENABLE_TARGET_EXPORT "Enable exporting of CMake targets. Disable when it causes problems!" ON)
+option(BUILD_SHARED_AND_STATIC_LIBS "Build both shared and static libraries" OFF)
+option(CJSON_OVERRIDE_BUILD_SHARED_LIBS "Override BUILD_SHARED_LIBS with CJSON_BUILD_SHARED_LIBS" OFF)
+option(CJSON_BUILD_SHARED_LIBS "Overrides BUILD_SHARED_LIBS if CJSON_OVERRIDE_BUILD_SHARED_LIBS is enabled" ON)
+option(ENABLE_CJSON_VERSION_SO "Enables cJSON so version" ON)
+option(ENABLE_CJSON_UTILS "Enable building the cJSON_Utils library." OFF)
+option(ENABLE_CJSON_UNINSTALL "Enable creating uninstall target" ON)
+option(ENABLE_LOCALES "Enable the use of locales" ON)
+option(ENABLE_VALGRIND OFF "Enable the valgrind memory checker for the tests.")
 
 set(CJSON_VERSION_SO 1)
 set(CJSON_UTILS_VERSION_SO 1)
-
 set(custom_compiler_flags)
 
 include(CheckCCompilerFlag)
-option(ENABLE_CUSTOM_COMPILER_FLAGS "Enables custom compiler flags" ON)
+include(GNUInstallDirs)
+
 if (ENABLE_CUSTOM_COMPILER_FLAGS)
     if (("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"))
         list(APPEND custom_compiler_flags
@@ -67,7 +81,6 @@ if (ENABLE_CUSTOM_COMPILER_FLAGS)
     endif()
 endif()
 
-option(ENABLE_SANITIZERS "Enables AddressSanitizer and UndefinedBehaviorSanitizer." OFF)
 if (ENABLE_SANITIZERS)
     list(APPEND custom_compiler_flags
         -fno-omit-frame-pointer
@@ -80,7 +93,6 @@ if (ENABLE_SANITIZERS)
         )
 endif()
 
-option(ENABLE_COVERAGE "Enables code coverage reporting for non-debug builds" ON)
 if(ENABLE_COVERAGE)
     if(NOT MSVC)
         list(APPEND custom_compiler_flags
@@ -94,7 +106,6 @@ if(ENABLE_COVERAGE)
     endif()
 endif()
 
-option(ENABLE_SAFE_STACK "Enables the SafeStack instrumentation pass by the Code Pointer Integrity Project" OFF)
 if (ENABLE_SAFE_STACK)
     if (ENABLE_SANITIZERS)
         message(FATAL_ERROR "ENABLE_SAFE_STACK cannot be used in combination with ENABLE_SANITIZERS")
@@ -104,7 +115,6 @@ if (ENABLE_SAFE_STACK)
         )
 endif()
 
-option(ENABLE_PUBLIC_SYMBOLS "Export library symbols." On)
 if (ENABLE_PUBLIC_SYMBOLS)
     list(APPEND custom_compiler_flags -fvisibility=hidden)
     add_definitions(-DCJSON_EXPORT_SYMBOLS -DCJSON_API_VISIBILITY)
@@ -125,26 +135,17 @@ foreach(compiler_flag ${custom_compiler_flags})
     endif()
 endforeach()
 
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-option(ENABLE_TARGET_EXPORT "Enable exporting of CMake targets. Disable when it causes problems!" ON)
-
 #cJSON
 set(CJSON_LIB cjson)
 
 file(GLOB HEADERS cJSON.h)
 set(SOURCES cJSON.c)
 
-option(BUILD_SHARED_AND_STATIC_LIBS "Build both shared and static libraries" OFF)
-option(CJSON_OVERRIDE_BUILD_SHARED_LIBS "Override BUILD_SHARED_LIBS with CJSON_BUILD_SHARED_LIBS" OFF)
-option(CJSON_BUILD_SHARED_LIBS "Overrides BUILD_SHARED_LIBS if CJSON_OVERRIDE_BUILD_SHARED_LIBS is enabled" ON)
-option(ENABLE_CJSON_VERSION_SO "Enables cJSON so version" ON)
-
 if ((CJSON_OVERRIDE_BUILD_SHARED_LIBS AND CJSON_BUILD_SHARED_LIBS) OR ((NOT CJSON_OVERRIDE_BUILD_SHARED_LIBS) AND BUILD_SHARED_LIBS))
     set(CJSON_LIBRARY_TYPE SHARED)
 else()
     set(CJSON_LIBRARY_TYPE STATIC)
 endif()
-
 
 if (NOT BUILD_SHARED_AND_STATIC_LIBS)
     add_library("${CJSON_LIB}" "${CJSON_LIBRARY_TYPE}" "${HEADERS}" "${SOURCES}")
@@ -191,7 +192,6 @@ if(ENABLE_CJSON_VERSION_SO)
 endif()
 
 #cJSON_Utils
-option(ENABLE_CJSON_UTILS "Enable building the cJSON_Utils library." OFF)
 if(ENABLE_CJSON_UTILS)
     set(CJSON_UTILS_LIB cjson_utils)
 
@@ -282,14 +282,12 @@ if(ENABLE_CJSON_TEST)
 endif()
 
 #Create the uninstall target
-option(ENABLE_CJSON_UNINSTALL "Enable creating uninstall target" ON)
 if(ENABLE_CJSON_UNINSTALL)
   add_custom_target(uninstall "${CMAKE_COMMAND}" -P
     "${PROJECT_SOURCE_DIR}/library_config/uninstall.cmake")
 endif()
 
 # Enable the use of locales
-option(ENABLE_LOCALES "Enable the use of locales" ON)
 if(ENABLE_LOCALES)
 	add_definitions(-DENABLE_LOCALES)
 endif()

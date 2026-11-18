@@ -60,7 +60,6 @@ if(ENABLE_CJSON_TEST)
         minify_tests
     )
 
-    option(ENABLE_VALGRIND OFF "Enable the valgrind memory checker for the tests.")
     if (ENABLE_VALGRIND)
         find_program(MEMORYCHECK_COMMAND valgrind)
         if ("${MEMORYCHECK_COMMAND}" MATCHES "MEMORYCHECK_COMMAND-NOTFOUND")
